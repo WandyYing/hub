@@ -1,0 +1,16 @@
+de/zalando/ep/zalenium/util/TestUtils.class
+de/zalando/ep/zalenium/dashboard/DashboardTest.class
+de/zalando/ep/zalenium/dashboard/DashboardCleanupServletTest.class
+de/zalando/ep/zalenium/it/ParallelIT.class
+de/zalando/ep/zalenium/util/KubernetesContainerMock.class
+de/zalando/ep/zalenium/proxy/SauceLabsRemoteProxyTest.class
+de/zalando/ep/zalenium/dashboard/DashboardCleanupServletTest$1.class
+de/zalando/ep/zalenium/proxy/CloudTestingRemoteProxyTest.class
+de/zalando/ep/zalenium/proxy/TestingBotRemoteProxyTest.class
+de/zalando/ep/zalenium/servlet/LiveNodeServletTest.class
+de/zalando/ep/zalenium/proxy/DockerSeleniumRemoteProxyTest.class
+de/zalando/ep/zalenium/util/DockerContainerMock.class
+de/zalando/ep/zalenium/servlet/ZaleniumConsoleServletTest.class
+de/zalando/ep/zalenium/util/TestUtils$1.class
+de/zalando/ep/zalenium/proxy/DockerSeleniumStarterRemoteProxyTest.class
+de/zalando/ep/zalenium/proxy/BrowserStackRemoteProxyTest.class
