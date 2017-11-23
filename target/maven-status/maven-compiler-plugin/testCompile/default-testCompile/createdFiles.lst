@@ -2,6 +2,7 @@ de/zalando/ep/zalenium/util/TestUtils.class
 de/zalando/ep/zalenium/dashboard/DashboardTest.class
 de/zalando/ep/zalenium/dashboard/DashboardCleanupServletTest.class
 de/zalando/ep/zalenium/it/ParallelIT.class
+de/zalando/ep/zalenium/container/DockerContainerClientTest.class
 de/zalando/ep/zalenium/util/KubernetesContainerMock.class
 de/zalando/ep/zalenium/proxy/SauceLabsRemoteProxyTest.class
 de/zalando/ep/zalenium/dashboard/DashboardCleanupServletTest$1.class

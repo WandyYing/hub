@@ -9,6 +9,7 @@
 /home/wandy/Documents/zalenium2/src/test/java/de/zalando/ep/zalenium/util/KubernetesContainerMock.java
 /home/wandy/Documents/zalenium2/src/test/java/de/zalando/ep/zalenium/proxy/DockerSeleniumStarterRemoteProxyTest.java
 /home/wandy/Documents/zalenium2/src/test/java/de/zalando/ep/zalenium/proxy/CloudTestingRemoteProxyTest.java
+/home/wandy/Documents/zalenium2/src/test/java/de/zalando/ep/zalenium/container/DockerContainerClientTest.java
 /home/wandy/Documents/zalenium2/src/test/java/de/zalando/ep/zalenium/util/TestUtils.java
 /home/wandy/Documents/zalenium2/src/test/java/de/zalando/ep/zalenium/servlet/LiveNodeServletTest.java
 /home/wandy/Documents/zalenium2/src/test/java/de/zalando/ep/zalenium/it/ParallelIT.java

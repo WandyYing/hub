@@ -1,9 +1,9 @@
 #== Ubuntu xenial is 16.04, i.e. FROM ubuntu:16.04
 # Find latest images at https://hub.docker.com/r/library/ubuntu/
 # Layer size: big: ~130 MB
-FROM ubuntu:xenial-20171006
+FROM ubuntu:xenial-20171114
 ENV UBUNTU_FLAVOR="xenial" \
-    UBUNTU_DATE="20171006"
+    UBUNTU_DATE="20171114"
 
 #== Ubuntu flavors - common
 RUN  echo "deb http://archive.ubuntu.com/ubuntu ${UBUNTU_FLAVOR} main universe\n" > /etc/apt/sources.list \
@@ -306,7 +306,7 @@ RUN set -x \
 # ------------------------#
 # https://docs.saucelabs.com/reference/sauce-connect/
 # Layer size: medium: ~13 MB
-ENV SAUCE_CONN_VER="sc-4.4.9-linux" \
+ENV SAUCE_CONN_VER="sc-4.4.10-linux" \
     SAUCE_CONN_DOWN_URL="https://saucelabs.com/downloads"
 RUN cd /tmp \
   && wget -nv "${SAUCE_CONN_DOWN_URL}/${SAUCE_CONN_VER}.tar.gz" \
@@ -364,7 +364,7 @@ RUN  export SELBASE="https://selenium-release.storage.googleapis.com" \
 #==========
 EXPOSE 4444 4445
 
-ENV ZAL_VER="zalenium-3.7.1b-SNAPSHOT" \
+ENV ZAL_VER="zalenium-3.7.1e-SNAPSHOT" \
     BROWSER_STACK_TUNNEL_OPTS="-skipCheck -v -forcelocal" \
     BROWSER_STACK_TUNNEL_ID="zalenium" \
     BROWSER_STACK_TUNNEL="false" \

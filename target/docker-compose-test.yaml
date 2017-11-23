@@ -5,7 +5,7 @@ version: '2.1'
 services:
   #--------------#
   zalenium:
-    image: "zalenium:3.7.1b-SNAPSHOT"
+    image: "zalenium:3.7.1e-SNAPSHOT"
     container_name: zalenium
     hostname: zalenium
     tty: true
@@ -16,8 +16,7 @@ services:
     ports:
       - 4444:4444
     command: >
-      start --chromeContainers 1
-            --firefoxContainers 1
+      start --desiredContainers 2
             --maxDockerSeleniumContainers 8
             --screenWidth 800 --screenHeight 600
             --timeZone "Europe/Berlin"

@@ -5,9 +5,11 @@ SELENIUM_IMAGE_NAME="elgalu/selenium"
 MAX_TEST_SESSIONS=1
 CHROME_CONTAINERS=1
 FIREFOX_CONTAINERS=1
+DESIRED_CONTAINERS=2
 MAX_DOCKER_SELENIUM_CONTAINERS=10
 SELENIUM_ARTIFACT="$(pwd)/selenium-server-standalone-3.7.1.jar"
-ZALENIUM_ARTIFACT="$(pwd)/zalenium-3.7.1b-SNAPSHOT.jar"
+ZALENIUM_ARTIFACT="$(pwd)/zalenium-3.7.1e-SNAPSHOT.jar"
+DEPRECATED_PARAMETERS=false
 SAUCE_LABS_ENABLED=false
 BROWSER_STACK_ENABLED=false
 TESTINGBOT_ENABLED=false
@@ -148,7 +150,8 @@ WaitForVideosTransferred() {
 
             # Also check if there are mkv, this would mean that
             # docker-selenium failed to convert them to mp4
-            local __amount_of_mkv_files=$(ls -1q find /home/seluser/videos/ -name '*.mkv' | wc -l)
+            #local __amount_of_mkv_files=$(ls -1q find /home/seluser/videos/ -name '*.mkv' | wc -l)
+            local __amount_of_mkv_files=$(find /home/seluser/videos/ -name '*.mkv' | wc -l)
             if [ ${__amount_of_mkv_files} -gt 0 ]; then
                 for __filename in /home/seluser/videos/*.mkv; do
                     local __new_file_name="$(basename ${__filename} .mkv).mp4"
@@ -237,13 +240,13 @@ DockerTerminate()
             --data tid="$GA_TRACKING_ID"
             --data cid="$RANDOM_USER_GA_ID"
             --data an="zalenium"
-            --data av="zalenium-3.7.1b-SNAPSHOT.jar"
+            --data av="zalenium-3.7.1e-SNAPSHOT.jar"
             --data cd="$ZALENIUM_STOP_COMMAND"
             --data sc="end"
             --data ds="docker"
         )
 
-        if [[ "zalenium-3.7.1b-SNAPSHOT.jar" == *"SNAPSHOT"* ]]; then
+        if [[ "zalenium-3.7.1e-SNAPSHOT.jar" == *"SNAPSHOT"* ]]; then
             echo "Not sending info to GA since this is a SNAPSHOT version"
         else
             curl ${GA_ENDPOINT} "${args[@]}" \
@@ -267,9 +270,10 @@ StartUp()
         EnsureCleanEnv
 
         log "Ensuring docker-selenium is available..."
-        DOCKER_SELENIUM_IMAGE_COUNT=$(docker images | grep "elgalu/selenium" | wc -l)
+        DOCKER_SELENIUM_IMAGE_COUNT=$(docker images | grep ${SELENIUM_IMAGE_NAME} | wc -l)
         if [ ${DOCKER_SELENIUM_IMAGE_COUNT} -eq 0 ]; then
-            echo "Seems that docker-selenium's image has not been downloaded yet, please run 'docker pull elgalu/selenium' first"
+            echo "Seems that docker-selenium's image has not been pulled yet"
+            echo "Please run 'docker pull elgalu/selenium', or use your own compatible image via --seleniumImageName"
             exit 1
         fi
     fi
@@ -345,8 +349,10 @@ StartUp()
         fi
     fi
 
-    export ZALENIUM_CHROME_CONTAINERS=${CHROME_CONTAINERS}
-    export ZALENIUM_FIREFOX_CONTAINERS=${FIREFOX_CONTAINERS}
+    if [ "$DEPRECATED_PARAMETERS" = true ]; then
+        DESIRED_CONTAINERS=$((CHROME_CONTAINERS + FIREFOX_CONTAINERS))
+    fi
+    export ZALENIUM_DESIRED_CONTAINERS=${DESIRED_CONTAINERS}
     export ZALENIUM_MAX_DOCKER_SELENIUM_CONTAINERS=${MAX_DOCKER_SELENIUM_CONTAINERS}
     export ZALENIUM_VIDEO_RECORDING_ENABLED=${VIDEO_RECORDING_ENABLED}
     export ZALENIUM_TZ=${TZ}
@@ -374,7 +380,7 @@ StartUp()
     export ZALENIUM_GA_TRACKING_ID=${GA_TRACKING_ID}
     export ZALENIUM_GA_ENDPOINT=${GA_ENDPOINT}
     export ZALENIUM_GA_ANONYMOUS_CLIENT_ID=${RANDOM_USER_GA_ID}
-    if [[ "zalenium-3.7.1b-SNAPSHOT.jar" != *"SNAPSHOT"* ]]; then
+    if [[ "zalenium-3.7.1e-SNAPSHOT.jar" != *"SNAPSHOT"* ]]; then
         export ZALENIUM_SEND_ANONYMOUS_USAGE_INFO=${SEND_ANONYMOUS_USAGE_INFO}
     fi
 
@@ -566,11 +572,12 @@ StartUp()
         fi
 
         # Gathering the options used to start Zalenium, in order to learn about the used options
-        ZALENIUM_START_COMMAND="zalenium.sh --chromeContainers $CHROME_CONTAINERS --firefoxContainers
-            $FIREFOX_CONTAINERS --maxDockerSeleniumContainers $MAX_DOCKER_SELENIUM_CONTAINERS
-            --sauceLabsEnabled $SAUCE_LABS_ENABLED --browserStackEnabled $BROWSER_STACK_ENABLED
-            --testingBotEnabled $TESTINGBOT_ENABLED --videoRecordingEnabled $VIDEO_RECORDING_ENABLED
-            --screenWidth $SCREEN_WIDTH --screenHeight $SCREEN_HEIGHT --timeZone $TZ"
+        ZALENIUM_START_COMMAND="zalenium.sh --deprecatedParameters $DEPRECATED_PARAMETERS
+            --desiredContainers $DESIRED_CONTAINERS --maxDockerSeleniumContainers $MAX_DOCKER_SELENIUM_CONTAINERS
+            --maxTestSessions $MAX_TEST_SESSIONS --sauceLabsEnabled $SAUCE_LABS_ENABLED
+            --browserStackEnabled $BROWSER_STACK_ENABLED --testingBotEnabled $TESTINGBOT_ENABLED
+            --videoRecordingEnabled $VIDEO_RECORDING_ENABLED --screenWidth $SCREEN_WIDTH --screenHeight $SCREEN_HEIGHT
+            --timeZone $TZ"
 
         local args=(
             --max-time 10
@@ -580,7 +587,7 @@ StartUp()
             --data tid="$GA_TRACKING_ID"
             --data cid="$RANDOM_USER_GA_ID"
             --data an="zalenium"
-            --data av="zalenium-3.7.1b-SNAPSHOT.jar"
+            --data av="zalenium-3.7.1e-SNAPSHOT.jar"
             --data cd="$ZALENIUM_START_COMMAND"
             --data sc="start"
             --data ds="docker"
@@ -594,7 +601,7 @@ StartUp()
             --data cm2="$TOTAL_MEMORY"
         )
 
-        if [[ "zalenium-3.7.1b-SNAPSHOT.jar" == *"SNAPSHOT"* ]]; then
+        if [[ "zalenium-3.7.1e-SNAPSHOT.jar" == *"SNAPSHOT"* ]]; then
             echo "Not sending info to GA since this is a SNAPSHOT version"
         else
             curl ${GA_ENDPOINT} \
@@ -736,8 +743,7 @@ function usage()
     echo "zalenium"
     echo -e "\t -h --help"
     echo -e "\t start <options, see below>"
-    echo -e "\t --chromeContainers -> Number of Chrome containers created on startup. Default is 1."
-    echo -e "\t --firefoxContainers -> Number of Firefox containers created on startup. Default is 1."
+    echo -e "\t --desiredContainers -> Number of nodes/containers created on startup. Default is 2."
     echo -e "\t --maxDockerSeleniumContainers -> Max number of docker-selenium containers running at the same time. Default is 10."
     echo -e "\t --sauceLabsEnabled -> Determines if the Sauce Labs node is started. Defaults to 'false'."
     echo -e "\t --browserStackEnabled -> Determines if the Browser Stack node is started. Defaults to 'false'."
@@ -758,12 +764,10 @@ function usage()
     echo -e "\t stop"
     echo ""
     echo -e "\t Examples:"
-    echo -e "\t - Starting Zalenium with 2 Chrome containers and with Sauce Labs"
-    echo -e "\t start --chromeContainers 2 --sauceLabsEnabled true"
-    echo -e "\t - Starting Zalenium with 2 Firefox containers and with BrowserStack"
-    echo -e "\t start --chromeContainers 2 --browserStackEnabled true"
-    echo -e "\t - Starting Zalenium with 2 Firefox containers and with TestingBot"
-    echo -e "\t start --chromeContainers 2 --testingBotEnabled true"
+    echo -e "\t - Starting Zalenium with 2 containers and with Sauce Labs"
+    echo -e "\t start --desiredContainers 2 --sauceLabsEnabled true"
+    echo -e "\t - Starting Zalenium with 2 containers and with BrowserStack"
+    echo -e "\t start --desiredContainers 2 --browserStackEnabled true"
     echo -e "\t - Starting Zalenium screen width 1440 and height 810, time zone \"America/Montreal\""
     echo -e "\t start --screenWidth 1440 --screenHeight 810 --timeZone \"America/Montreal\""
 }
@@ -787,10 +791,15 @@ case ${SCRIPT_ACTION} in
                     exit
                     ;;
                 --chromeContainers)
+                    DEPRECATED_PARAMETERS=true
                     CHROME_CONTAINERS=${VALUE}
                     ;;
                 --firefoxContainers)
+                    DEPRECATED_PARAMETERS=true
                     FIREFOX_CONTAINERS=${VALUE}
+                    ;;
+                --desiredContainers)
+                    DESIRED_CONTAINERS=${VALUE}
                     ;;
                 --maxDockerSeleniumContainers)
                     MAX_DOCKER_SELENIUM_CONTAINERS=${VALUE}
